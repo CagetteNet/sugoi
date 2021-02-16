@@ -12,6 +12,7 @@ class Enum extends FormElement<Int>
 	public var verticle:Bool;
 	public var labelRight:Bool;
 	var checked : Array<Bool>;
+	public var activatedValues:Array<Int>;
 	
 
 	public var columns:Int;
@@ -34,6 +35,7 @@ class Enum extends FormElement<Int>
 		
 		this.verticle = verticle;
 		this.labelRight = labelRight;
+
 		
 		//trace("value = " + value);
 		
@@ -44,6 +46,9 @@ class Enum extends FormElement<Int>
 		}
 
 		columns = 1;
+
+
+		this.activatedValues = new Array();
 	}
 	
 	override function getTypedValue(str:String):Int {
@@ -62,6 +67,11 @@ class Enum extends FormElement<Int>
 		return Type.resolveEnum(enumName).createByIndex(value);
 	}
 
+	public function setActivatedValues(activatedValues:Array<Int>)
+	{
+		this.activatedValues = activatedValues;
+	}
+
 	override public function render():String
 	{
 		var s = "";
@@ -74,7 +84,23 @@ class Enum extends FormElement<Int>
 
 		var c = 0;
 
-		var array = Type.allEnums(Type.resolveEnum(enumName));
+		var array2 = Type.allEnums(Type.resolveEnum(enumName));
+		//Filter the Enum with activatedValues
+		var array = new Array();
+		if(this.activatedValues.length == 0)
+		{
+			array = array2;
+		}
+		else
+		{
+			for(v in this.activatedValues)
+			{
+				array.push(array2[v]);
+			}
+		}
+		
+
+
 
 		var rowsPerColumn = Math.ceil(array.length / columns);
 		s = "<table style='margin-bottom:8px;'><tr>";

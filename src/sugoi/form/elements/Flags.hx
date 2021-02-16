@@ -58,6 +58,8 @@ class Flags<T> extends FormElement<Int>
 	public var excluded : Array<Int>; //indexes of flags you want to exclude
 
 	public var columns:Int;
+
+	public var flagsToRemove:Array<String>;
 	
 	/**
 	 *
@@ -88,11 +90,17 @@ class Flags<T> extends FormElement<Int>
 		}
 		
 		columns = 1;
+
+		this.flagsToRemove = new Array();
+	}
+
+	public function setFlagsToRemove(flagsToRemove:Array<String>)
+	{
+		this.flagsToRemove = flagsToRemove;
 	}
 	
 	override public function populate()
 	{
-		
 		var v  = Web.getParamValues(parentForm.name + "_" + name);
 		value = 0;
 		
@@ -101,7 +109,6 @@ class Flags<T> extends FormElement<Int>
 			for (vv in v) {
 				val.set( FakeFlag.createByIndex(Std.parseInt(vv)) );
 			}
-			
 			value = val.toInt();
 		}
 	}
@@ -110,12 +117,18 @@ class Flags<T> extends FormElement<Int>
 	{
 		var s = "";
 		var n = parentForm.name + "_" +name;
+
+
+		var array = Lambda.array(data);
 		
 		var tagCss = getClasses();
 		var labelCss = getLabelClasses();
 			
 		var c = 0;
-		var array = Lambda.array(data);
+
+
+
+
 		if (array != null)
 		{
 			//trace("L" + array.length);
@@ -138,12 +151,24 @@ class Flags<T> extends FormElement<Int>
 					
 					var row:Dynamic = array[c];
 					
-					var checkbox = "<input type=\"checkbox\" class=\"" + tagCss + "\" name=\""+n+"[]\" id=\""+n+c+"\" value=\""+c+"\" " + (checked[c]? "checked":"") +" ></input>\n";
-					var label;
+					var checkbox = "";
+					if(flagsToRemove.indexOf(row)==-1)
+					{
+						checkbox = "<input type=\"checkbox\" class=\"" + tagCss + "\" name=\""+n+"[]\" id=\""+n+c+"\" value=\""+c+"\" " + (checked[c]? "checked":"") +" ></input>\n";
+					}
+					else
+					{
+						checkbox = "<input type=\"hidden\" class=\"" + tagCss + "\" name=\""+n+"[]\" id=\""+n+c+"\" value=\""+c+"\" " + (checked[c]? "checked":"") +" ></input>\n";
+					}
+					var label = "";
 					
 					var t = Form.translator;
 					
-					label = "<label for=\"" + n + c + "\" class=\""+''/*labelCss*/+"\" > " + t._(row)  +"</label>\n";
+					if(flagsToRemove.indexOf(row)==-1)
+					{
+						label = "<label for=\"" + n + c + "\" class=\""+''/*labelCss*/+"\" > " + t._(row)  +"</label>\n";
+					}
+					
 					
 					
 					if (labelRight)
